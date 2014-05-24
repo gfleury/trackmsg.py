@@ -10,17 +10,7 @@ Usage
 usage: trackmsg.py [-h] [-s SERVER] [-f SENDER] [-t RECIPIENT] [-r RELAY_HOST]
                    [-l LOGFILE]
 
- ./trackmsg.py -l maillog -f '.*gmail.com' 
-+------------+--------+------------------------------+----------------------------+------------------+----------------+--------------------------+
-| Message ID | Status |             From             |             To             |   Relay Server   | Sender Server  |     Extended Status      |
-+------------+--------+------------------------------+----------------------------+------------------+----------------+--------------------------+
-| 6F6C7C07DE |  sent  | lxxxxxxxxxxxxxxxxxxx@gmai... | gfleuryxxxxxxxx@xxxxxxx.br | exchangefront_xx | localhost[127. | (250 2.6.0 <CAHT2ZQukW7b |
-|            |        |                              |                            | xxxxxxxx.xxx[10. |     0.0.1]     | 4ku9nkb0TcW2YV+OMxWkpqLW |
-|            |        |                              |                            |   xxx.x.xx]:25   |                | 23ONUgm-NxmnHVA@mail.gma |
-|            |        |                              |                            |                  |                | il.com> Queued mail for  |
-|            |        |                              |                            |                  |                |        delivery)         |
-+------------+--------+------------------------------+----------------------------+------------------+----------------+--------------------------+
-
+![alt text](https://raw.githubusercontent.com/gfleury/trackmsg.py/master/usage.png "Usage")
 
 You can use regex on any arguments. 
 
