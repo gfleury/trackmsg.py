@@ -29,7 +29,7 @@ if args.server is None and args.recipient is None and args.relay_host is None an
 search_tokens = []
 messages_dict = {}
 
-id_regex = re.compile (" [A-F0-9]{10}")
+id_regex = re.compile (" [A-F0-9]{7,10}")
 
 client_regex = re.compile (".* client=(.*)$")
 
