@@ -41,6 +41,9 @@ relay_regex = re.compile (" relay=(.*?(?:\[.*\].?[0-9]*)?), ")
 
 status_regex = re.compile (" status=(.*?) (.*)$")
 
+score_regex = re.compile (" Hits: ([0-9\-\.]+), ")
+
+amavisstatus_regex = re.compile("\([0-9\-]+\)([a-zA-Z\- ]+)")
 
 if args.server:
 	search_tokens.append(re.compile(".* client=.*" + args.server + ".*$"))
@@ -49,11 +52,13 @@ else:
 
 if args.sender:
 	search_tokens.append(re.compile(".* from=<" + args.sender + ">.*"))
+	search_tokens.append(re.compile(".*<" + args.sender + "> ->.*"))
 elif not args.server:
 	search_tokens.append(from_regex)
 
 if args.recipient:
 	search_tokens.append(re.compile(".* to=<" + args.recipient + ">.*"))
+	search_tokens.append(re.compile(".* -> .*<" + args.recipient + ">.*"))
 elif not args.sender and not args.server:
 	search_tokens.append(to_regex)
 
@@ -66,7 +71,7 @@ infile = args.logfile
 with open(infile) as f:
 	f = f.readlines()
 
-table = PrettyTable(["Message ID", "Status", "From", "To", "Relay Server", "Sender Server", "Extended Status"])
+table = PrettyTable(["Message ID", "Status", "From", "To", "Score", "Relay Server", "Sender Server", "Extended Status"])
 
 
 # Client, from, to + relay
@@ -77,7 +82,7 @@ for line in f:
 			message_ids = id_regex.findall(line)
 			if message_ids:
 				message_id = message_ids[0].lstrip()
-				message_id_regex = re.compile(".* " + message_id + ": .*")
+				message_id_regex = re.compile(".* " + message_id + "[:,] .*")
 				if not message_id_regex in search_tokens:
 					if args.server or (args.sender and not client_regex.match(line)) or ((args.recipient or args.relay_host) and (not from_regex.match(line)  and not client_regex.match(line))):
 						#print line
@@ -91,6 +96,7 @@ for line in f:
 					messages_dict[message_id]['recipient'] = None
 					messages_dict[message_id]['relay'] = None
 					messages_dict[message_id]['status'] = None
+					messages_dict[message_id]['score'] = "N/A"
 				
 				client = client_regex.findall(line)
 				if client:
@@ -110,11 +116,21 @@ for line in f:
 				if relay:
 					messages_dict[message_id]['relay'] = wrap_always(relay[0], 16)
 					
+				score = score_regex.findall(line)
+				if score:
+					amavisstatus = amavisstatus_regex.findall(line)
+					if not amavisstatus:
+						amavisstatus = "N/A"
+					else:
+						amavisstatus = amavisstatus[0].replace(" ", "\n")
+					score = "%s\n%s" % (score[0], amavisstatus)
+					messages_dict[message_id]['score'] = wrap_always(score, 15).replace("\n\n", "\n")
+
 				status = status_regex.findall(line)
 				if status:
 					messages_dict[message_id]['status'] = status[0][0]
 					messages_dict[message_id]['status_extended'] = wrap_always(status[0][1], 24)
-					table.add_row ([messages_dict[message_id]['id'], messages_dict[message_id]['status'], messages_dict[message_id]['sender'], messages_dict[message_id]['recipient'], messages_dict[message_id]['relay'], messages_dict[message_id]['server'], messages_dict[message_id]['status_extended']])
+					table.add_row ([messages_dict[message_id]['id'], messages_dict[message_id]['status'], messages_dict[message_id]['sender'], messages_dict[message_id]['recipient'], messages_dict[message_id]['score'], messages_dict[message_id]['relay'], messages_dict[message_id]['server'], messages_dict[message_id]['status_extended']])
 					break
 
 			break
