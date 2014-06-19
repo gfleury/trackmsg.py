@@ -43,7 +43,7 @@ status_regex = re.compile (" status=(.*?) (.*)$")
 
 score_regex = re.compile (" Hits: ([0-9\-\.]+), ")
 
-amavisstatus_regex = re.compile("\([0-9\-]+\)([a-zA-Z\- ]+)")
+amavisstatus_regex = re.compile("\([0-9\-]+\)([a-zA-Z\- 0-9]+)")
 
 if args.server:
 	search_tokens.append(re.compile(".* client=.*" + args.server + ".*$"))
